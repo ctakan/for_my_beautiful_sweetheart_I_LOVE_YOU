@@ -27,19 +27,10 @@
             flex-direction: column;
             align-items: center;
         }
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 15px;
-        }
-        p {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-        }
         .carousel {
             position: relative;
             width: 100%;
             max-width: 400px;
-            height: auto;
             aspect-ratio: 4 / 3;
             overflow: hidden;
             display: flex;
@@ -65,18 +56,22 @@
             font-weight: bold;
             max-width: 400px;
         }
-        audio {
-            width: 100%;
-            margin-top: 20px;
+        .music-button {
+            display: none;
+            background: rgba(255, 255, 255, 0.5);
+            color: #ff3366;
+            font-size: 1rem;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 15px;
         }
-
-        @media (max-width: 500px) {
-            h1 {
-                font-size: 1.5rem;
-            }
-            p, .caption {
-                font-size: 1rem;
-            }
+        .music-button.show {
+            display: block;
+        }
+        audio {
+            display: none;
         }
     </style>
 </head>
@@ -86,6 +81,7 @@
         <p>Ты - самое лучшее, что есть в моей жизни ❤️</p>
 
         <div class="carousel">
+            <img src="https://i.postimg.cc/zB9TKZpL/photo-2025-01-04-08-11-26.jpg" class="active" alt="Моя дорогая Айжана! Хотел бы вспомнить некоторые моменты нашей жизни...">
             <img src="https://i.postimg.cc/zXxS2WPF/photo-2024-12-08-16-12-26.jpg" class="active" alt="Тут мы только познокомились с твоей мамой в Алматы... Это было волнительно🫠">
             <img src="https://i.postimg.cc/pTQKfnF8/IMG-2345.png" alt="Здесь - уже в Аларче, и это наша первая совместная фотография ❤️">
             <img src="https://i.postimg.cc/2ypSTHnX/photo-2025-02-04-11-40-05.jpg" alt="А тут мы уже в Москве - такие крутые!!!">
@@ -95,7 +91,9 @@
 
         <p class="caption">Тут мы только познокомились с твоей мамой в Алматы... Это было волнительно🫠</p>
 
-        <audio id="bg-music" autoplay loop>
+        <button id="play-music" class="music-button">🎵 Включить музыку</button>
+
+        <audio id="bg-music" loop>
             <source src="https://files.catbox.moe/i9fw14.mp3" type="audio/mpeg">
         </audio>
     </div>
@@ -110,7 +108,7 @@
             "Ещё - я очень обожаю спать на тебе, помнишь поездку в поезде в Питер? 🥺",
             "Тут тоже крутые, нас парочка фоткала, но они не такие же влюблённые, как и мы 😝"
         ];
-        const intervals = [5000, 4000, 6000, 7000, 5000]; // Время показа каждого фото (мс)
+        const intervals = [9000, 6000, 6000, 6000, 6000];
         const captionText = document.querySelector('.caption');
 
         function changeSlide() {
@@ -121,20 +119,33 @@
             setTimeout(changeSlide, intervals[index]);
         }
 
-        setTimeout(changeSlide, intervals[0]); // Запуск с первого интервала
+        setTimeout(changeSlide, intervals[0]);
 
-        // Автовоспроизведение музыки (для мобильных устройств нужен пользовательский жест)
+        const audio = document.getElementById("bg-music");
+        const playButton = document.getElementById("play-music");
+
         document.addEventListener("DOMContentLoaded", () => {
-            const audio = document.getElementById("bg-music");
-            audio.volume = 0.5; // Уменьшил громкость на 50%
-            audio.play().catch(() => {
-                console.log("Автовоспроизведение заблокировано. Ожидание взаимодействия пользователя...");
-            });
+            audio.volume = 0.5;
+            const playPromise = audio.play();
 
-            document.addEventListener("click", () => {
-                audio.play();
-            }, { once: true });
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    console.log("Музыка автоматически включилась!");
+                }).catch(() => {
+                    console.log("Автовоспроизведение заблокировано, показываю кнопку.");
+                    playButton.classList.add("show");
+                });
+            }
         });
+
+        playButton.addEventListener("click", () => {
+            audio.play();
+            playButton.classList.remove("show");
+        });
+
+        document.addEventListener("click", () => {
+            audio.play();
+        }, { once: true });
     </script>
 </body>
 </html>
